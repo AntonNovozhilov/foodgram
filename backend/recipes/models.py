@@ -28,8 +28,8 @@ class Tag(models.Model):
                         )
     
     class Meta:
-    verbose_name = 'Тэг'
-    verbose_name_plural = 'Тэги'
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
 
 class Recipes(models.Model):
@@ -58,5 +58,5 @@ class Recipes(models.Model):
     )
 
     class Meta:
-    verbose_name = 'Рецепт'
-    verbose_name_plural = 'Рецепты'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
