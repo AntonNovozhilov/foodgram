@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
-from backend.constants import MEASUREMENT_UNITS
+from backend.constants import MEASUREMENT_UNITS, TAGS
 
 User = get_user_model()
 
@@ -61,7 +61,9 @@ class Recipes(models.Model):
 
     author = models.ForeignKey(User,
                                verbose_name="Автор",
-                               on_delete=models.CASCADE, blank=False
+                               on_delete=models.CASCADE,
+                               blank=False,
+                               related_name='recipes'
                             )
     name = models.CharField(max_length=256,
                              verbose_name="Название рецепта",
@@ -81,12 +83,10 @@ class Recipes(models.Model):
     ingredients = models.ManyToManyField(Ingridients,
                                     verbose_name="Ингридиенты для рецепта",
                                     blank=False,
-                                    null=False
                                 )
     tags = models.ManyToManyField(Tag,
                              verbose_name="Теги рецепта",
                              blank=False,
-                             null=False
                             )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления в минутах",

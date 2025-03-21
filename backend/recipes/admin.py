@@ -5,8 +5,9 @@ from .models import Ingridients, Recipes, Tag
 
 @admin.register(Ingridients)
 class IngridietAdmin(admin.ModelAdmin):
-    list_display = ('title', 'measurement_unit', 'amount')
+    list_display = ('title', 'measurement_unit')
     fields = [('title', 'measurement_unit', 'amount')]
+    search_fields = ('title',)
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -16,8 +17,17 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Recipes)
 class RecipesAdmin(admin.ModelAdmin):
-    list_display = ('author', 'name', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
-    list_editable = ('name', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
+    list_display = ('name', 'author')
+    search_fields = ('name', 'author__username')
+    list_filter = ('tags',)
+    readonly_fields = ('favorited_count',)
+
+    def favorited_count(self, obj):
+        return obj.author.recipes.filter(is_favorited=True).count()
+    favorited_count.__name__ = 'Добавлений в избранное'
+    
+    
+    
     
 
 
