@@ -108,3 +108,39 @@ class Recipes(models.Model):
 
     def __str__(self):
         return f'Рецепт {self.name}'
+    
+class FavoritsRecipes(models.Model):
+    recipes = models.ForeignKey(Recipes,
+                                on_delete=models.CASCADE,
+                                verbose_name='Рецепты')
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name='Пользователь',
+                             help_text='У какого пользователя рецепт в избраном'
+                            )
+
+    class Meta:
+        verbose_name = 'Рецепт в избранном'
+        verbose_name_plural = 'Рецепты в избранном'
+
+    def __str__(self):
+        return f'{self.recipes}'
+
+    
+class ShoppingCard(models.Model):
+    recipes = models.ForeignKey(Recipes,
+                                verbose_name='Рецепт',
+                                on_delete=models.CASCADE,
+                                help_text='Какой рецепт надо добавить в список'
+                            )
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name='Пользователь',
+                             help_text='Какому пользователю добавить рецепт в список покупок')
+    
+    class Meta:
+        verbose_name = 'Список покупок для рецептов'
+        verbose_name_plural = 'Списки покупок для рецептов'
+
+    def __str__(self):
+        return f'{self.recipes}'

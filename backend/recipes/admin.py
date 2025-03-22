@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Ingridients, Recipes, Tag
+from .models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
 
 
 @admin.register(Ingridients)
@@ -26,7 +26,13 @@ class RecipesAdmin(admin.ModelAdmin):
         return obj.author.recipes.filter(is_favorited=True).count()
     favorited_count.__name__ = 'Добавлений в избранное'
     
-    
+@admin.register(ShoppingCard)
+class ShoppingCardAdmin(admin.ModelAdmin):
+    list_display = ['recipes', 'user']
+
+@admin.register(FavoritsRecipes)
+class FavoritsRecipesAdmin(admin.ModelAdmin):
+    list_display = ['recipes', 'user']
     
     
 
