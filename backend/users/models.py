@@ -6,18 +6,18 @@ class MyUser(AbstractUser):
     username = models.CharField(
         max_length=150,
         unique=True,
-        verbose_name='Никнейм пользователя'
+        verbose_name='Уникальный юзернейм'
     )
-    first_name = models.CharField(max_length=150, unique=True, verbose_name='Имя пользователя')
-    last_name = models.CharField(max_length=150, unique=True, verbose_name='Фамилия пользователя')
-    email = models.EmailField(max_length=256, unique=True, verbose_name='Почта пользователя')
-    password = models.CharField(max_length=100, unique=True, verbose_name='Пароль пользователя')
-    avatar = models.ImageField(verbose_name='Аватар пользователя',
+    first_name = models.CharField(max_length=150, unique=True, verbose_name='Имя')
+    last_name = models.CharField(max_length=150, unique=True, verbose_name='Фамилия')
+    email = models.EmailField(max_length=254, unique=True, verbose_name='Адрес электронной почты')
+    password = models.CharField(max_length=100, verbose_name='Пароль')
+    avatar = models.ImageField(verbose_name='Ссылка на аватар',
                                upload_to='avatars',
                                blank=False,
                                default='/frontend/build/static/media/userpic-icon.2e3faa821bb5398be2c6.jpg'
                                )
-    is_subscribed = models.BooleanField(blank=False)
+    is_subscribed = models.BooleanField(blank=False, verbose_name='Подписан ли текущий пользователь на этого')
 
 
     class Meta:

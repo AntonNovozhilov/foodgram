@@ -38,12 +38,12 @@ class Ingridients(models.Model):
 
 class Tag(models.Model):
 
-    title = models.CharField(max_length=256,
-                             verbose_name="Название тэга",
+    name = models.CharField(max_length=256,
+                             verbose_name="Уникальное название",
                              unique=True, blank=False, null=False
                             )
     slug = models.SlugField(max_length=256,
-                            verbose_name="Слаг",
+                            verbose_name="Уникальный слаг",
                             unique=True,
                             blank=False,
                             null=False
@@ -54,7 +54,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Тэги'
 
     def __str__(self):
-        return f'{self.title} ({self.slug})'
+        return f'{self.name} ({self.slug})'
 
 
 class Recipes(models.Model):
@@ -66,7 +66,7 @@ class Recipes(models.Model):
                                related_name='recipes'
                             )
     name = models.CharField(max_length=256,
-                             verbose_name="Название рецепта",
+                             verbose_name="Название",
                              unique=True,
                              blank=False
                             )
@@ -76,20 +76,22 @@ class Recipes(models.Model):
                               null=False
                             )
     text = models.TextField(max_length=650,
-                            verbose_name="Описание рецепта",
+                            verbose_name="Описание",
                             blank=False,
                             null=False
                         )
     ingredients = models.ManyToManyField(Ingridients,
-                                    verbose_name="Ингридиенты для рецепта",
+                                    verbose_name="Список ингредиентов",
+                                    related_name='ingredients',
                                     blank=False,
                                 )
     tags = models.ManyToManyField(Tag,
-                             verbose_name="Теги рецепта",
+                             verbose_name="Список id тегов",
                              blank=False,
+                             related_name='tags'
                             )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name="Время приготовления в минутах",
+        verbose_name="Время приготовления (в минутах)",
         blank=False,
         null=False
     )
@@ -112,6 +114,7 @@ class Recipes(models.Model):
 class FavoritsRecipes(models.Model):
     recipes = models.ForeignKey(Recipes,
                                 on_delete=models.CASCADE,
+                                related_name='recipes',
                                 verbose_name='Рецепты')
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
@@ -131,6 +134,7 @@ class ShoppingCard(models.Model):
     recipes = models.ForeignKey(Recipes,
                                 verbose_name='Рецепт',
                                 on_delete=models.CASCADE,
+                                related_name='recipes_in_card',
                                 help_text='Какой рецепт надо добавить в список'
                             )
     user = models.ForeignKey(User,

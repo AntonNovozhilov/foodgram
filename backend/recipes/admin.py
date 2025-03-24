@@ -11,9 +11,9 @@ class IngridietAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug')
-    fields = [('title', 'slug')]
-    prepopulated_fields = {'slug': ('title',)}
+    list_display = ('name', 'slug')
+    fields = [('name', 'slug')]
+    prepopulated_fields = {'slug': ('name',)}
 
 @admin.register(Recipes)
 class RecipesAdmin(admin.ModelAdmin):
