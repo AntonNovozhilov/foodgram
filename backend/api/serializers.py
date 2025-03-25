@@ -43,8 +43,10 @@ class ShoppingCardSerializer(serializers.ModelSerializer):
         fields = ('recipes_in_card',)
 
 class MyUserSerializer(serializers.ModelSerializer):
+    avatar = fields.Base64ImageField(required=False)
 
     class Meta:
         model = MyUser
         fields = ('username', 'email', 'first_name', 'last_name', 'password', 'avatar', 'is_subscribed', 'recipes',)
+        read_only_fields = ('is_subscribed', 'recipes',)
         

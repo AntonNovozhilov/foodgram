@@ -8,8 +8,8 @@ class MyUser(AbstractUser):
         unique=True,
         verbose_name='Уникальный юзернейм'
     )
-    first_name = models.CharField(max_length=150, unique=True, verbose_name='Имя')
-    last_name = models.CharField(max_length=150, unique=True, verbose_name='Фамилия')
+    first_name = models.CharField(max_length=150, verbose_name='Имя')
+    last_name = models.CharField(max_length=150, verbose_name='Фамилия')
     email = models.EmailField(max_length=254, unique=True, verbose_name='Адрес электронной почты')
     password = models.CharField(max_length=100, verbose_name='Пароль')
     avatar = models.ImageField(verbose_name='Ссылка на аватар',
@@ -17,7 +17,7 @@ class MyUser(AbstractUser):
                                blank=False,
                                default='/frontend/build/static/media/userpic-icon.2e3faa821bb5398be2c6.jpg'
                                )
-    is_subscribed = models.BooleanField(blank=False, verbose_name='Подписан ли текущий пользователь на этого')
+    is_subscribed = models.BooleanField(default=False, verbose_name='Подписан ли текущий пользователь на этого')
 
 
     class Meta:
