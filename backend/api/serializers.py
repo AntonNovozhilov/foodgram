@@ -49,4 +49,11 @@ class MyUserSerializer(serializers.ModelSerializer):
         model = MyUser
         fields = ('username', 'email', 'first_name', 'last_name', 'password', 'avatar', 'is_subscribed', 'recipes',)
         read_only_fields = ('is_subscribed', 'recipes',)
+
+
+# class ShoppingCardSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = ShoppingCard
+#         fields = ('name', image, cooking_time, ingredients)
         

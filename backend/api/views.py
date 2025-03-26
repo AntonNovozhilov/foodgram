@@ -1,13 +1,15 @@
 from http import HTTPStatus
 
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.serializers import FavoritsRecipesSerializer, MyUserSerializer, RecipesSerializers, TagSerializer
 from users.models import MyUser
-from recipes.models import FavoritsRecipes, Recipes, Tag
+from recipes.models import FavoritsRecipes, Recipes, ShoppingCard, Tag
 from .mixins import UserMixins
+from backend.settings import ALLOWED_HOSTS
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,10 +24,18 @@ class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     serializer_class = RecipesSerializers
 
-    # @action(detail=False, url_path='get-link')
-    # def link(self, request):
-    #     obj = Recipes.objects.get('id')
-    #     return obj.
+    @action(detail=True, url_path='get-link')
+    def link(self, request, pk=None):
+        obj = get_object_or_404(Recipes, pk=pk)
+        return Response({'short-link': f'https://{ALLOWED_HOSTS[0]}/recipes/{obj.id}/'})
+    
+    # @action(detail=True, methods=['get','post', 'delete'], url_path='shopping_cart')
+    # def shopp_list(self, request):
+
+# class ShoppingListViewSet(viewsets.ModelViewSet):
+#     queryset = ShoppingCard
+#     serializer_class = ()
+
     
 
 class UserViewSet(UserMixins):
