@@ -1,15 +1,17 @@
 from http import HTTPStatus
 
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.serializers import FavoritsRecipesSerializer, MyUserSerializer, RecipesSerializers, TagSerializer
+from api.serializers import FavoritsRecipesSerializer, MyUserSerializer, RecipesSerializers, TagSerializer, ShoppingCardSerializer
 from users.models import MyUser
 from recipes.models import FavoritsRecipes, Recipes, ShoppingCard, Tag
 from .mixins import UserMixins
-from backend.settings import ALLOWED_HOSTS
+from backend.settings import ALLOWED_HOSTS, MEDIA_ROOT
+import os
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -29,12 +31,61 @@ class RecipesViewSet(viewsets.ModelViewSet):
         obj = get_object_or_404(Recipes, pk=pk)
         return Response({'short-link': f'https://{ALLOWED_HOSTS[0]}/recipes/{obj.id}/'})
     
-    # @action(detail=True, methods=['get','post', 'delete'], url_path='shopping_cart')
-    # def shopp_list(self, request):
+    
+    @action(detail=False, url_path='download_shopping_cart')
+    def down_cart(self, request):
+        user = request.user
+        obj = ShoppingCard.objects.filter(user=user)
+        ingredients_list = []
+        for item in obj:
+            for recipes in item:
+                for ingridiets in recipes.ingredients.all():
+                    ingredients_list.append(f'{ingridiets.titel} - {ingridiets.measurement_unit} - {ingridiets.amount}')
+        file_text= os.path.join(MEDIA_ROOT, 'list_shopping_cart.txt')
+        with open (file_text, 'w') as file:
+            file.write('\n'.join(ingredients_list))
+        return FileResponse(open(file_text, 'rb'), as_attachment=True, filename='list_shopping_cart.txt')
+    
+    @action(detail=True, methods=['post', 'delete'], url_path='shopping_cart')
+    def post_recipes_shopp_cart(self, request, pk=None):
+        recipes = get_object_or_404(Recipes, pk=pk)
+        user = request.user
+        shoppingcart = ShoppingCard.objects.filter(user=user, recipes=recipes)
+        if request.method == 'POST':
+            if shoppingcart.exists():
+                return Response({'errors': 'Рецепт уже с писке покупок'}, status=HTTPStatus.BAD_REQUEST)
+            new_entry = ShoppingCard.objects.create(user=user, recipes=recipes)
+            serializer = ShoppingCardSerializer(new_entry)
+            return Response(serializer.data, status=HTTPStatus.CREATED)
+        if request.method == 'DELETE':
+            if shoppingcart.exists():
+                shoppingcart.delete()
+                return Response({'detail': 'Рецепт успешно удален из списка покупок'}, status=HTTPStatus.OK)
+            return Response({'detail': 'Рецепта нет в списке покупок'}, status=HTTPStatus.BAD_REQUEST)
+        
 
-# class ShoppingListViewSet(viewsets.ModelViewSet):
-#     queryset = ShoppingCard
-#     serializer_class = ()
+    @action(detail=True, methods=['post', 'delete'], url_path='favorite')
+    def post_recipes_favorite(self, request, pk=None):
+        recipes = get_object_or_404(Recipes, pk=pk)
+        user = request.user
+        favorite = FavoritsRecipes.objects.filter(user=user, recipes=recipes)
+        if request.method == 'POST':
+            if favorite.exists():
+                return Response({'errors': 'Рецепт уже в списке избранных'}, status=HTTPStatus.BAD_REQUEST)
+            new_entry = FavoritsRecipes.objects.create(user=user, recipes=recipes)
+            serializer = FavoritsRecipesSerializer(new_entry)
+            return Response(serializer.data, status=HTTPStatus.CREATED)
+        if request.method == 'DELETE':
+            if favorite.exists():
+                favorite.delete()
+                return Response({'detail': 'Рецепт успешно удален из списка избранных'}, status=HTTPStatus.OK)
+            return Response({'detail': 'Рецепта нет в списке избранных'}, status=HTTPStatus.BAD_REQUEST)
+
+
+
+class ShoppingListViewSet(viewsets.ModelViewSet):
+    queryset = ShoppingCard.objects.all()
+    serializer_class = ShoppingCardSerializer
 
     
 

@@ -4,12 +4,7 @@ from drf_extra_fields import fields
 from users.models import MyUser
 from recipes.models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
 
-# class Base64Serializer(serializers.ModelSerializer):
-#     image = fields.Base64ImageField(required=False)
 
-#     class Meta:
-#         model = Recipes
-#         fields = ('image',)
 
 class IngridientsSerializer(serializers.ModelSerializer):
     
@@ -51,9 +46,10 @@ class MyUserSerializer(serializers.ModelSerializer):
         read_only_fields = ('is_subscribed', 'recipes',)
 
 
-# class ShoppingCardSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = ShoppingCard
-#         fields = ('name', image, cooking_time, ingredients)
+class ShoppingCardSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ShoppingCard
+        fields = ('recipes', 'user',)
         

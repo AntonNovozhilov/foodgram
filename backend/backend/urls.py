@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from rest_framework import routers
 
-from api.views import RecipesViewSet, TagViewSet, UserViewSet
+from api.views import RecipesViewSet, ShoppingListViewSet, TagViewSet, UserViewSet
 
 router = DefaultRouter()
 
