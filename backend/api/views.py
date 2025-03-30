@@ -6,10 +6,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.serializers import FavoritsRecipesSerializer, MyUserSerializer, RecipesSerializers, TagSerializer, ShoppingCardSerializer
-from users.models import MyUser
-from recipes.models import FavoritsRecipes, Recipes, ShoppingCard, Tag
-from .mixins import UserMixins
+from api.serializers import FavoritsRecipesSerializer, IngridientsSerializer, MyUserSerializer, RecipesSerializers, SubscriberSerializer, TagSerializer, ShoppingCardSerializer
+from users.models import MyUser, Subscriptions
+from recipes.models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
+from .mixins import IngridientsMixins, UserMixins
 from backend.settings import ALLOWED_HOSTS, MEDIA_ROOT
 import os
 
@@ -87,7 +87,9 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
     queryset = ShoppingCard.objects.all()
     serializer_class = ShoppingCardSerializer
 
-    
+class IngridientsViewSet(IngridientsMixins):
+    queryset = Ingridients.objects.all()
+    serializer_class = IngridientsSerializer
 
 class UserViewSet(UserMixins):
     queryset = MyUser.objects.all()
@@ -95,9 +97,10 @@ class UserViewSet(UserMixins):
 
     @action(detail=False)
     def me(self, request):
-        obj = request.user
-        serializer = self.get_serializer(obj)
-        return Response(serializer.data)
+        # obj = request.user
+        # serializer = self.get_serializer(obj)
+        # serializer = MyUserSerializer(obj)
+        return Response(MyUserSerializer(request.user).data)
     
     @action(detail=False, url_path='me/avatar', methods=['put', 'delete'])
     def put_avatar(self, request):
@@ -121,5 +124,39 @@ class UserViewSet(UserMixins):
                 return Response(serializer.data, status=HTTPStatus.NO_CONTENT)
             return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
         return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
+    
+    @action(detail=False, url_path='subscriptions')
+    def list_sub(self, request):
+        user = request.user
+        queryset = MyUser.objects.filter(subscriptions__author=user)
+        serializer = SubscriberSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post', 'delete'])
+    def subscribe(self, request):
+        user = request.user
+        author = get_object_or_404(MyUser, id=self.kwargs.get('id'))
+        if request.method == 'POST':
+            new_sub = Subscriptions.objects.create(author=author , subscription=user)
+            serializer = SubscriberSerializer(new_sub, context={'request': request})
+            return Response(serializer.data, status=HTTPStatus.CREATED)
+        if request.method == 'DELETE':
+            subscription = get_object_or_404(Subscriptions,
+                                             user=user,
+                                             author=author)
+            subscription.delete()
+            return Response(status=HTTPStatus.NO_CONTENT)
+
+
+# class SubscriptionsViewSet(viewsets.ModelViewSet):
+#     queryset = Subscriptions.objects.all()
+#     serializer_class = SubscriberSerializer
+
+#     @action(detail=False, url_path='subscriptions')
+#     def list_sub(self, request):
+#         queryset = Subscriptions.objects.filter(followings__subscription=self.request.user)
+#         serializer = SubscriberSerializer(queryset, many=True)
+#         return Response(serializer.data)
+
 
 

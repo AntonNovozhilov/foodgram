@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from drf_extra_fields import fields
 
-from users.models import MyUser
+from users.models import MyUser, Subscriptions
 from recipes.models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
 
 
@@ -10,7 +10,7 @@ class IngridientsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Ingridients
-        fields = ('title', 'measurement_unit',)
+        fields = ('id', 'title', 'measurement_unit',)
 
 class TagSerializer(serializers.ModelSerializer):
 
@@ -42,9 +42,23 @@ class MyUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'avatar', 'is_subscribed', 'recipes',)
+        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'avatar', 'is_subscribed', 'recipes', )
         read_only_fields = ('is_subscribed', 'recipes',)
 
+class SubscriberSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = RecipesSerializers(many=True)
+    recipes_count = serializers.IntegerField(source='recipes.count', read_only=True)
+    avatar = fields.Base64ImageField(required=False)
+
+    class Meta:
+        model = MyUser
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count', 'avatar') 
+        read_only_fields = ('recipes', )
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        return Subscriptions.objects.filter(subscription=user, author=obj).exists()
 
 
 class ShoppingCardSerializer(serializers.ModelSerializer):

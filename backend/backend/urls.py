@@ -4,13 +4,14 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from rest_framework import routers
 
-from api.views import RecipesViewSet, ShoppingListViewSet, TagViewSet, UserViewSet
+from api.views import IngridientsViewSet, RecipesViewSet, ShoppingListViewSet, TagViewSet, UserViewSet
 
 router = DefaultRouter()
 
 router.register(r'tags', TagViewSet, basename='tag')
 router.register(r'recipes', RecipesViewSet, basename='recipes')
 router.register(r'users', UserViewSet, basename='users')
+router.register(r'ingredients', IngridientsViewSet, basename='ingridients')
 
 
 

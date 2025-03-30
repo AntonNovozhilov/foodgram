@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+
 class MyUser(AbstractUser):
     username = models.CharField(
         max_length=150,
@@ -17,6 +18,7 @@ class MyUser(AbstractUser):
                                blank=False,
                                default='/frontend/build/static/media/userpic-icon.2e3faa821bb5398be2c6.jpg'
                                )
+    # is_subscribed = models.ForeignKey(Subscriptions, )
     is_subscribed = models.BooleanField(default=False, verbose_name='Подписан ли текущий пользователь на этого')
 
 
@@ -29,12 +31,12 @@ class Subscriptions(models.Model):
     author = models.ForeignKey(MyUser,
                                verbose_name='Автор рецепта',
                                on_delete=models.CASCADE,
-                               related_name='subscriptions'
+                               related_name='subscribers'
                             )
     subscription = models.ForeignKey(MyUser,
                                     verbose_name='Подписчик',
                                     on_delete=models.CASCADE,
-                                    related_name='subscription'
+                                    related_name='subscriptions'
                                 )
 
     class Meta:
