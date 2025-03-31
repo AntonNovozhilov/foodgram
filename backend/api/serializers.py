@@ -10,7 +10,7 @@ class IngridientsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Ingridients
-        fields = ('id', 'title', 'measurement_unit',)
+        fields = ('id', 'name', 'measurement_unit',)
 
 class TagSerializer(serializers.ModelSerializer):
 

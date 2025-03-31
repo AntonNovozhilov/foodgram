@@ -5,9 +5,9 @@ from .models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
 
 @admin.register(Ingridients)
 class IngridietAdmin(admin.ModelAdmin):
-    list_display = ('title', 'measurement_unit')
-    fields = [('title', 'measurement_unit', 'amount')]
-    search_fields = ('title',)
+    list_display = ('name', 'measurement_unit')
+    fields = [('name', 'measurement_unit', 'amount')]
+    search_fields = ('name',)
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

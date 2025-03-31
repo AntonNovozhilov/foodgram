@@ -8,7 +8,7 @@ User = get_user_model()
 
 class Ingridients(models.Model):
 
-    title = models.CharField(
+    name = models.CharField(
         max_length=256,
         verbose_name="Название ингридиентов",
         unique=True,

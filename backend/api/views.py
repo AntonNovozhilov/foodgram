@@ -2,11 +2,15 @@ from http import HTTPStatus
 
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from api.serializers import FavoritsRecipesSerializer, IngridientsSerializer, MyUserSerializer, RecipesSerializers, SubscriberSerializer, TagSerializer, ShoppingCardSerializer
+from api.permissions import OwnerPermission
 from users.models import MyUser, Subscriptions
 from recipes.models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
 from .mixins import IngridientsMixins, UserMixins
@@ -17,22 +21,28 @@ import os
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
+    permission_classes = [IsAuthenticated]
 
-class FavoritsRecipesViewSet(viewsets.ModelViewSet):
-    queryset = FavoritsRecipes.objects.all()
-    serializer_class = FavoritsRecipesSerializer
+# class FavoritsRecipesViewSet(viewsets.ModelViewSet):
+#     queryset = FavoritsRecipes.objects.all()
+#     serializer_class = FavoritsRecipesSerializer
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     serializer_class = RecipesSerializers
+    permission_classes = [OwnerPermission]
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('is_favorited', 'author', 'is_in_shopping_cart', 'tags')
 
-    @action(detail=True, url_path='get-link')
+    @action(detail=True, url_path='get-link', permission_classes=[IsAuthenticated])
     def link(self, request, pk=None):
         obj = get_object_or_404(Recipes, pk=pk)
         return Response({'short-link': f'https://{ALLOWED_HOSTS[0]}/recipes/{obj.id}/'})
     
     
-    @action(detail=False, url_path='download_shopping_cart')
+    @action(detail=False, url_path='download_shopping_cart', permission_classes=[IsAuthenticated])
     def down_cart(self, request):
         user = request.user
         obj = ShoppingCard.objects.filter(user=user)
@@ -46,7 +56,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             file.write('\n'.join(ingredients_list))
         return FileResponse(open(file_text, 'rb'), as_attachment=True, filename='list_shopping_cart.txt')
     
-    @action(detail=True, methods=['post', 'delete'], url_path='shopping_cart')
+    @action(detail=True, methods=['post', 'delete'], url_path='shopping_cart', permission_classes=[IsAuthenticated])
     def post_recipes_shopp_cart(self, request, pk=None):
         recipes = get_object_or_404(Recipes, pk=pk)
         user = request.user
@@ -64,7 +74,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Рецепта нет в списке покупок'}, status=HTTPStatus.BAD_REQUEST)
         
 
-    @action(detail=True, methods=['post', 'delete'], url_path='favorite')
+    @action(detail=True, methods=['post', 'delete'], url_path='favorite', permission_classes=[IsAuthenticated])
     def post_recipes_favorite(self, request, pk=None):
         recipes = get_object_or_404(Recipes, pk=pk)
         user = request.user
@@ -83,26 +93,28 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
 
 
-class ShoppingListViewSet(viewsets.ModelViewSet):
-    queryset = ShoppingCard.objects.all()
-    serializer_class = ShoppingCardSerializer
+# class ShoppingListViewSet(viewsets.ModelViewSet):
+#     queryset = ShoppingCard.objects.all()
+#     serializer_class = ShoppingCardSerializer
 
 class IngridientsViewSet(IngridientsMixins):
     queryset = Ingridients.objects.all()
     serializer_class = IngridientsSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('^name', )
 
 class UserViewSet(UserMixins):
     queryset = MyUser.objects.all()
     serializer_class = MyUserSerializer
+    pagination_class = PageNumberPagination
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[OwnerPermission])
     def me(self, request):
-        # obj = request.user
-        # serializer = self.get_serializer(obj)
-        # serializer = MyUserSerializer(obj)
         return Response(MyUserSerializer(request.user).data)
     
-    @action(detail=False, url_path='me/avatar', methods=['put', 'delete'])
+    @action(detail=False, url_path='me/avatar', methods=['put', 'delete'], permission_classes=[OwnerPermission])
     def put_avatar(self, request):
         obj = request.user
         avatar = request.data.get('avatar')
@@ -112,7 +124,7 @@ class UserViewSet(UserMixins):
             return Response(serializer.data, status=HTTPStatus.OK)
         return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
     
-    @action(detail=False, url_path='me/set_password', methods=['post'])
+    @action(detail=False, url_path='me/set_password', methods=['post'], permission_classes=[OwnerPermission])
     def post_password(self, request):
         obj = request.user
         new_password = request.data.get('new_password')
@@ -125,7 +137,7 @@ class UserViewSet(UserMixins):
             return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
         return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
     
-    @action(detail=False, url_path='subscriptions')
+    @action(detail=False, url_path='subscriptions', pagination_class=PageNumberPagination)
     def list_sub(self, request):
         user = request.user
         queryset = MyUser.objects.filter(subscriptions__author=user)
