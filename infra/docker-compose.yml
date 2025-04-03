@@ -19,11 +19,14 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - ../frontend/:/app/result_build/
-  nginx:
+  infra:
     container_name: foodgram-proxy
-    image: wowlass/foodgram_infra
+    build: ./
+    depends_on:
+      - backend
+      - frontend
     ports:
-      - "80:80"
+      - "9000:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
