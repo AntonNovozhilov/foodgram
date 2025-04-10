@@ -1,21 +1,21 @@
 from django.contrib import admin
 
-from .models import FavoritsRecipes, Ingridients, Recipes, ShoppingCard, Tag
+from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tags
 
 
-@admin.register(Ingridients)
+@admin.register(Ingredient)
 class IngridietAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
-    fields = [('name', 'measurement_unit', 'amount')]
+    fields = ('name', 'measurement_unit', 'amount')
     search_fields = ('name',)
 
-@admin.register(Tag)
+@admin.register(Tags)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     fields = [('name', 'slug')]
     prepopulated_fields = {'slug': ('name',)}
 
-@admin.register(Recipes)
+@admin.register(Recipe)
 class RecipesAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     search_fields = ('name', 'author__username')
@@ -26,13 +26,13 @@ class RecipesAdmin(admin.ModelAdmin):
         return obj.author.recipes.filter(is_favorited=True).count()
     favorited_count.__name__ = 'Добавлений в избранное'
     
-@admin.register(ShoppingCard)
+@admin.register(ShoppingCart)
 class ShoppingCardAdmin(admin.ModelAdmin):
-    list_display = ['recipes', 'user']
+    list_display = ['recipe', 'user']
 
-@admin.register(FavoritsRecipes)
+@admin.register(Favorite)
 class FavoritsRecipesAdmin(admin.ModelAdmin):
-    list_display = ['recipes', 'user']
+    list_display = ['recipe', 'user']
     
     
 

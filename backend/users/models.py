@@ -4,44 +4,24 @@ from django.db import models
 
 
 class MyUser(AbstractUser):
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-        verbose_name='Уникальный юзернейм'
-    )
+    username = models.CharField(max_length=150, unique=True, verbose_name='Уникальный юзернейм')
     first_name = models.CharField(max_length=150, verbose_name='Имя')
     last_name = models.CharField(max_length=150, verbose_name='Фамилия')
     email = models.EmailField(max_length=254, unique=True, verbose_name='Адрес электронной почты')
-    password = models.CharField(max_length=100, verbose_name='Пароль')
-    avatar = models.ImageField(verbose_name='Ссылка на аватар',
-                               upload_to='avatars',
-                               blank=False,
-                               default='/frontend/build/static/media/userpic-icon.2e3faa821bb5398be2c6.jpg'
-                               )
-    # is_subscribed = models.ForeignKey(Subscriptions, )
-    is_subscribed = models.BooleanField(default=False, verbose_name='Подписан ли текущий пользователь на этого')
-
+    avarat = models.ImageField(upload_to='avatar/', blank=True, null=True, verbose_name='Аватар')
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
-
-class Subscriptions(models.Model):
-    author = models.ForeignKey(MyUser,
-                               verbose_name='Автор рецепта',
-                               on_delete=models.CASCADE,
-                               related_name='subscribers'
-                            )
-    subscription = models.ForeignKey(MyUser,
-                                    verbose_name='Подписчик',
-                                    on_delete=models.CASCADE,
-                                    related_name='subscriptions'
-                                )
+    def __str__(self):
+        return f'{self.username}'
+        
+class Follow(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='follows')
+    following = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='followers')
 
     class Meta:
-        verbose_name = 'Подписчик'
-        verbose_name_plural = 'Подписчики'
-
-    def __str__(self):
-        return f'{self.subscription} подписался на {self.author}'
+        unique_together = ('user', 'following')
