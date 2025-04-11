@@ -24,6 +24,8 @@ class Ingredient(models.Model):
     class Meta:
         ordering = ['name']
         unique_together = ('name', 'measurement_unit')
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Инридиенты'
     
     def __str__(self):
         return f'{self.name} {self.measurement_unit}'
@@ -36,11 +38,14 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
     tags = models.ManyToManyField(Tags)
     cooking_time = models.PositiveSmallIntegerField()
-
     pub_date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingridients')
@@ -53,6 +58,8 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'recipe')
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
@@ -60,4 +67,6 @@ class ShoppingCart(models.Model):
 
     class Meta:
         unique_together = ('user', 'recipe')
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
 

@@ -1,8 +1,11 @@
+from django.db.models import Sum
+
+from datetime import datetime
 from http import HTTPStatus
 
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -10,6 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from api.serializers import FavoriteSerializer, FollowSerializer, IngtedienSerializer, RecipListShop, RecipeSerializer, ShoppingCartSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
 from api.permissions import IsAuthenticatedorCreate, OwnerPermission, IsAdminOrReadOnly
+from .pagination import CustomPagination
 from users.models import Follow, MyUser
 from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tags
 from backend.settings import ALLOWED_HOSTS
@@ -31,7 +35,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = MyUser.objects.all()
-    permission_classes = (IsAuthenticatedorCreate,)
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -43,7 +47,14 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
     
-    @action(detail=False, methods=['put', 'delete'], url_path='me/avatar/', permission_classes=[OwnerPermission])
+    @action(
+        detail=False,
+        methods=['put', 'post'],
+        permission_classes=[OwnerPermission],
+        url_path='set_password'
+    )
+
+    @action(detail=False, methods=['put', 'delete'], url_path='me/avatar', permission_classes=[OwnerPermission])
     def avatar(self, request):
         serializer = UserAvatarAdd(
             request.user,
@@ -57,7 +68,6 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=IsAuthenticated)
     def subscriptions(self, request):
-        queryset = MyUser.objects.filter(followers__follows=request.user)
         serializer = FollowSerializer(many=True, context={'request': request})
         return Response(serializer.data)
     
@@ -88,7 +98,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('is_favorited', 'author', 'is_in_shopping_cart', 'tags')
+    filterset_fields = ('author', 'tags')
 
     @action(detail=False, url_name='get-link', permission_classes=[IsAuthenticated])
     def get_link(self, request, pk=None):

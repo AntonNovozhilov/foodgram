@@ -7,9 +7,10 @@ services:
       - pg_data:/var/lib/postgresql/data
   backend: 
     container_name: foodgram-back
-    image: wowlass/foodgram_backend
+    # image: wowlass/foodgram_backend
+    build: ../backend
     volumes:
-      - static_volume:/app/static
+      - static_volume:/app/static/
     env_file: .env
     depends_on: 
       - postgres
@@ -19,6 +20,8 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
   infra:
     container_name: foodgram-proxy
     build: ./

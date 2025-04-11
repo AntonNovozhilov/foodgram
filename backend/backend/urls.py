@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/auth/', include('djoser.urls.authtoken')),
     path('api-token-auth/', views.obtain_auth_token)
+
 ]

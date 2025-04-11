@@ -6,7 +6,7 @@ from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tags
 @admin.register(Ingredient)
 class IngridietAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
-    fields = ('name', 'measurement_unit', 'amount')
+    fields = ('name', 'measurement_unit')
     search_fields = ('name',)
 
 @admin.register(Tags)

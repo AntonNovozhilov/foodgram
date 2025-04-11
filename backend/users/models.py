@@ -8,7 +8,7 @@ class MyUser(AbstractUser):
     first_name = models.CharField(max_length=150, verbose_name='Имя')
     last_name = models.CharField(max_length=150, verbose_name='Фамилия')
     email = models.EmailField(max_length=254, unique=True, verbose_name='Адрес электронной почты')
-    avarat = models.ImageField(upload_to='avatar/', blank=True, null=True, verbose_name='Аватар')
+    avatar = models.ImageField(upload_to='avatar/', blank=True, null=True, verbose_name='Аватар')
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
@@ -25,3 +25,5 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ('user', 'following')
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
