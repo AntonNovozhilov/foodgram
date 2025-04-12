@@ -7,10 +7,10 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return (request.method in permissions.SAFE_METHODS
                 or request.user.is_staff)
     
-class IsAuthenticateorReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
+# class IsAuthenticateorReadOnly(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         return (request.method in permissions.SAFE_METHODS
+#                 or request.user.is_authenticated)
 
 class OwnerPermission(permissions.BasePermission):
     def has_permission(self, request, view):

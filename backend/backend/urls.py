@@ -9,7 +9,7 @@ from api.views import IngredientViewSet, RecipeViewSet, TagViewSet, UserViewSet
 
 
 from django.views.generic import TemplateView
-from django.conf import settings               # 👈 для подключения статики
+from django.conf import settings
 from django.conf.urls.static import static
 
 router = DefaultRouter()

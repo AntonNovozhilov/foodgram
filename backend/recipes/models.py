@@ -48,8 +48,8 @@ class Recipe(models.Model):
         return f'{self.name}'
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingridients')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingridients_in_recipe')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='get_ingredients')
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredients_in_recipe')
     amount = models.PositiveSmallIntegerField()
 
 # class TagsinRecipe(models.Model):
