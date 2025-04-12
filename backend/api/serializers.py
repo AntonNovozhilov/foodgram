@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from djoser.serializers import UserSerializer
-from drf_extra_fields import fields
+from drf_extra_fields.fields import Base64ImageField
 
 from users.models import Follow, MyUser
 from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tags
@@ -10,13 +10,13 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tags
-        fields = ('name', 'slug',)
+        fields = ('id', 'name', 'slug',)
 
 class IngtedienSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit',)
+        fields = ('id', 'name', 'measurement_unit',)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,26 +32,42 @@ class UserSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return Follow.objects.filter(user=user, following=obj).exists()
+    
+class SetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+    current_password = serializers.CharField(required=True)
+
+    def validate_current_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError('Текущий пароль не верный')
+        return value
+    
+    def validate_new_password(self, value):
+        if self.context['request'].user == value:
+            raise serializers.ValidationError("Новый пароль не должен совпадать с текущим")
+        return value
+
+
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    avatar = serializers.ImageField(read_only=True)
 
     class Meta:
         model = MyUser
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'password', 'avatar')
+        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'password',)
 
     def create(self, validated_data):
         user = MyUser.objects.create_user(**validated_data)
         return user
     
 class UserAvatarAdd(serializers.ModelSerializer):
-    avatar = fields.Base64ImageField()
+    avatar = Base64ImageField()
 
     class Meta:
         model = MyUser
-        fields = ('email', 'username', 'first_name', 'last_name', 'avatar',)
+        fields = ('avatar',)
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),)
@@ -61,13 +77,20 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredient
         fields = ('id', 'amount',)
 
+# class TagsIngredientSerializer(serializers.ModelSerializer):
+#     id = serializers.PrimaryKeyRelatedField(queryset=Tags.objects.all(),)
+
+#     class Meta:
+#         model = TagsinRecipe
+#         fields = ('id', )
+
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
     ingredients = IngtedienSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    image = fields.Base64ImageField()
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -80,6 +103,38 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
         return obj.in_carts.filter(user=user).exists()
+    
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tags.objects.all(), many=True)
+    ingredients = IngtedienSerializer(many=True)
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = ('tags', 'ingredients', 'image', 'name', 'text', 'cooking_time', )
+
+    def create(self, validated_data):
+
+        ingredients_data = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for item in ingredients_data:
+            ingredient = item['id']
+            amount = item['amount']
+            RecipeIngredient.objects.create(
+                recipe=recipe,
+                ingredient=ingredient,
+                amount=amount
+            )
+        # for tag in tags:
+        #     tags = tag['id']
+        #     TagsinRecipe.objects.create(
+        #         recipe=recipe,
+        #         tags=tags
+        #     )
+        # tags_list = [tag['id'] for tag in tags]
+        recipe.tags.set(tags)
+        return recipe
     
 
 class FollowSerializer(UserSerializer):

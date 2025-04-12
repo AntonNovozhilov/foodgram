@@ -52,6 +52,10 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingridients_in_recipe')
     amount = models.PositiveSmallIntegerField()
 
+# class TagsinRecipe(models.Model):
+#     recipes = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='tags')
+#     tags = models.ForeignKey(Tags, on_delete=models.CASCADE, related_name='tags_in_recipe')
+
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorited_by')

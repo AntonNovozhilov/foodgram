@@ -20,11 +20,6 @@ class RecipesAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
-    readonly_fields = ('favorited_count',)
-
-    def favorited_count(self, obj):
-        return obj.author.recipes.filter(is_favorited=True).count()
-    favorited_count.__name__ = 'Добавлений в избранное'
     
 @admin.register(ShoppingCart)
 class ShoppingCardAdmin(admin.ModelAdmin):

@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.serializers import FavoriteSerializer, FollowSerializer, IngtedienSerializer, RecipListShop, RecipeSerializer, ShoppingCartSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
-from api.permissions import IsAuthenticatedorCreate, OwnerPermission, IsAdminOrReadOnly
+from api.serializers import FavoriteSerializer, FollowSerializer, IngtedienSerializer, RecipListShop, RecipeCreateSerializer, RecipeSerializer, SetPasswordSerializer, ShoppingCartSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
+from api.permissions import IsAuthenticatedorCreate, IsAuthenticateorReadOnly, OwnerPermission, IsAdminOrReadOnly
 from .pagination import CustomPagination
 from users.models import Follow, MyUser
 from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tags
@@ -23,12 +23,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tags.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticateorReadOnly,)
 
-class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngtedienSerializer
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticateorReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
     pagination_class = None
@@ -42,29 +42,36 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserCreateSerializer
         return UserSerializer
     
+    @action(detail=False, methods=['post'], url_path='set_password', permission_classes=[OwnerPermission])
+    def set_password(self, request):
+        serializer = SetPasswordSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({'status': 'Пароль успешно изменён'}, status=HTTPStatus.NO_CONTENT)
+    
     @action(detail=False, methods=['get'], permission_classes=[OwnerPermission])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
     
-    @action(
-        detail=False,
-        methods=['put', 'post'],
-        permission_classes=[OwnerPermission],
-        url_path='set_password'
-    )
 
     @action(detail=False, methods=['put', 'delete'], url_path='me/avatar', permission_classes=[OwnerPermission])
     def avatar(self, request):
-        serializer = UserAvatarAdd(
-            request.user,
-            data=request.data,
-            partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'avatar': request.user.avatar.url}, status=HTTPStatus.OK)
-        return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
+        user = request.user
+        if request.method == 'DELETE':
+            if user.avatar:
+                user.avatar.delete()
+            return Response({'avatar': None}, status=HTTPStatus.NO_CONTENT)
+        else:
+            if 'avatar' not in request.data:
+                return Response(status=HTTPStatus.BAD_REQUEST)
+            serializer = UserAvatarAdd(instance=user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'avatar': user.avatar.url}, status=HTTPStatus.OK)
+            return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
     
     @action(detail=False, methods=['get'], permission_classes=IsAuthenticated)
     def subscriptions(self, request):
@@ -96,11 +103,16 @@ class UserViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author', 'tags')
 
-    @action(detail=False, url_name='get-link', permission_classes=[IsAuthenticated])
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RecipeCreateSerializer
+        return RecipeSerializer
+
+    @action(detail=True, url_name='get-link', permission_classes=[IsAuthenticated])
     def get_link(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         link = f'https://{ALLOWED_HOSTS[0]}/recipes/{recipe.id}/'
