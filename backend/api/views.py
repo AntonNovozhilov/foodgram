@@ -21,12 +21,14 @@ from backend.settings import ALLOWED_HOSTS
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    '''Тэги.'''
     queryset = Tags.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    '''Ингридиенты.'''
     queryset = Ingredient.objects.all()
     serializer_class = IngtedienSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -35,16 +37,19 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 class UserViewSet(viewsets.ModelViewSet):
+    '''Пользователь'''
     queryset = MyUser.objects.all()
     pagination_class = CustomPagination
 
     def get_serializer_class(self):
+        '''Выбор сериализатора.'''
         if self.action == 'create':
             return UserCreateSerializer
         return CustomUserSerializer
     
     @action(detail=False, methods=['post'], url_path='set_password', permission_classes=[OwnerPermission])
     def set_password(self, request):
+        '''Смена пароля.'''
         serializer = SetPasswordSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = request.user
@@ -54,12 +59,14 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[OwnerPermission])
     def me(self, request):
+        '''Получение своей карточки.'''
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
     
 
     @action(detail=False, methods=['put', 'delete'], url_path='me/avatar', permission_classes=[OwnerPermission])
     def avatar(self, request):
+        '''Аватар пользователя.'''
         user = request.user
         if request.method == 'DELETE':
             if user.avatar:
@@ -76,12 +83,14 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
+        '''Подписки.'''
         authors = MyUser.objects.filter(followers__user=request.user)
         serializer = FollowSerializer(authors, many=True, context={'request': request})
         return Response(serializer.data)
     
     @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def subscribe(self, request, pk):
+        '''Подписаться, отписаться.'''
         following = get_object_or_404(MyUser, pk=pk)
         user = request.user
         if request.method == 'POST':
@@ -102,6 +111,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({'errors': 'Подписки нет'}, status=HTTPStatus.BAD_REQUEST)
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    '''Рецепты.'''
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -111,10 +121,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
+        '''Создание.'''
         serializer.save(author=self.request.user)
 
 
     def destroy(self, request, pk):
+        '''Удаление.'''
         recipe = self.get_object()
         if recipe.author == request.user:
             recipe.delete()
@@ -122,6 +134,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=HTTPStatus.FORBIDDEN)
 
     def partial_update(self, request, *args, **kwargs):
+        '''Обновление.'''
         recipe = self.get_object()
         if recipe.author != request.user:
             return Response(status=HTTPStatus.FORBIDDEN)
@@ -134,12 +147,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, url_path='get-link', permission_classes=[IsAuthenticatedOrReadOnly])
     def get_link(self, request, pk=None):
+        '''Получение ссылки.'''
         recipe = get_object_or_404(Recipe, pk=pk)
         link = f'https://{ALLOWED_HOSTS[0]}/recipes/{recipe.id}/'
         return Response({'short-link': link}, status=HTTPStatus.OK)
     
     @action(detail=True, url_path='favorite', methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
+        '''Добавление и удаление из избранного.'''
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
         if request.method == 'POST':
@@ -157,6 +172,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         
     @action(detail=True, url_path='shopping_cart', methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
+        '''Список покупок.'''
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
         if request.method == 'POST':
@@ -174,6 +190,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         
     @action(detail=False, methods=['get'], url_path='download_shopping_cart')
     def download_shopping_cart(self, request):
+        '''Скачать список покупак.'''
         recipe_ids = request.user.cart.values_list('recipe__id', flat=True)
         ingredients = (
             IngredientAmount.objects
