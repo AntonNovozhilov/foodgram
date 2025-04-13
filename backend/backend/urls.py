@@ -5,9 +5,11 @@ from rest_framework.authtoken import views
 from django.conf import settings
 from django.conf.urls.static import static
 
-from api.views import IngredientViewSet, RecipeViewSet, TagViewSet, UserViewSet
-
-
+from api.api_v1.views import (
+    IngredientViewSet,
+    RecipeViewSet,
+    TagViewSet,
+    UserViewSet)
 
 router = DefaultRouter()
 
@@ -16,13 +18,11 @@ router.register(r'recipes', RecipeViewSet, basename='recipes')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'ingredients', IngredientViewSet, basename='ingridients')
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/auth/', include('djoser.urls.authtoken')),
-    path('api-token-auth/', views.obtain_auth_token),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/auth/', include('djoser.urls.authtoken')),
+    path('v1/api-token-auth/', views.obtain_auth_token),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
