@@ -1,23 +1,38 @@
-from django.db.models import Sum
-
-from datetime import datetime
 from http import HTTPStatus
 
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.serializers import CustomUserSerializer, RecipMiniSerializer, FollowSerializer, IngtedienSerializer, RecipeSerializer, SetPasswordSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
-from api.permissions import IsAuthenticatedorCreate, OwnerPermission, IsAdminOrReadOnly
-from .pagination import CustomPagination
+from api.serializers import (
+    CustomUserSerializer,
+    RecipMiniSerializer,
+    FollowSerializer,
+    IngtedienSerializer,
+    RecipeSerializer,
+    SetPasswordSerializer,
+    TagSerializer,
+    UserAvatarAdd,
+    UserCreateSerializer,
+)
+from api.permissions import OwnerPermission
 from users.models import Follow, MyUser
-from recipes.models import Favorite, Ingredient, IngredientAmount, Recipe, RecipeIngredient, ShoppingCart, Tags
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    ShoppingCart,
+    Tags
+)
 from backend.settings import ALLOWED_HOSTS
+from .pagination import CustomPagination
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -46,8 +61,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return UserCreateSerializer
         return CustomUserSerializer
-    
-    @action(detail=False, methods=['post'], url_path='set_password', permission_classes=[OwnerPermission])
+
+    @action(detail=False, methods=['post'],
+            url_path='set_password',
+            permission_classes=[OwnerPermission]
+            )
     def set_password(self, request):
         '''Смена пароля.'''
         serializer = SetPasswordSerializer(data=request.data, context={'request': request})
@@ -64,7 +82,11 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 
-    @action(detail=False, methods=['put', 'delete'], url_path='me/avatar', permission_classes=[OwnerPermission])
+    @action(detail=False,
+            methods=['put', 'delete'],
+            url_path='me/avatar',
+            permission_classes=[OwnerPermission]
+            )
     def avatar(self, request):
         '''Аватар пользователя.'''
         user = request.user
@@ -125,7 +147,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-    def destroy(self, request, pk):
+    def destroy(self, request):
         '''Удаление.'''
         recipe = self.get_object()
         if recipe.author == request.user:

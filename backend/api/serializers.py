@@ -14,6 +14,7 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tags
         fields = ('id', 'name', 'slug',)
 
+
 class IngtedienSerializer(serializers.ModelSerializer):
     '''Ингридиенты.'''
 
@@ -38,7 +39,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return Follow.objects.filter(user=user, following=obj).exists()
-    
+
+
 class SetPasswordSerializer(serializers.Serializer):
     '''Смена пароля'''
     new_password = serializers.CharField(required=True)
@@ -50,14 +52,12 @@ class SetPasswordSerializer(serializers.Serializer):
         if not user.check_password(value):
             raise serializers.ValidationError('Текущий пароль не верный')
         return value
-    
+
     def validate_new_password(self, value):
         '''Проверка нового пароля.'''
         if self.context['request'].user == value:
             raise serializers.ValidationError("Новый пароль не должен совпадать с текущим")
         return value
-
-
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -72,7 +72,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         '''Создание.'''
         user = MyUser.objects.create_user(**validated_data)
         return user
-    
+
+
 class UserAvatarAdd(serializers.ModelSerializer):
     '''Добавление аватара.'''
     avatar = Base64ImageField()
@@ -133,8 +134,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return obj.cart.filter(user=user).exists()
-    
-
 
     def validate(self, data):
         '''Проверка на логику.'''
@@ -197,7 +196,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         tags_data = self.initial_data.get('tags')
         if tags_data is None:
-                raise serializers.ValidationError('Нужен тег')
+            raise serializers.ValidationError('Нужен тег')
         for tag_id in tags_data:
             tags = Tags.objects.filter(id=tag_id).first()
             if not tags:
@@ -237,7 +236,7 @@ class FollowSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return Follow.objects.filter(user=user, following=obj).exists()
-    
+
     def get_recipes(self, obj):
         '''Для списка рецептов.'''
         request = self.context.get('request')
