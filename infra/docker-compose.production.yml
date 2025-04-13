@@ -7,8 +7,7 @@ services:
       - pg_data:/var/lib/postgresql/data
   backend: 
     container_name: foodgram-back
-    # image: wowlass/foodgram_backend
-    build: ../backend
+    image: wowlass/foodgram_backend
     volumes:
       - static_volume:/app/static/
       - media:/app/media/
