@@ -11,6 +11,7 @@ services:
     build: ../backend
     volumes:
       - static_volume:/app/static/
+      - media:/app/media/
     env_file: .env
     depends_on: 
       - postgres
@@ -35,6 +36,8 @@ services:
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/app/static/
+      - media:/app/media/
 volumes:
   pg_data:
   static_volume:
+  media:
