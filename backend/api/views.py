@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.serializers import FavoriteSerializer, FollowSerializer, IngtedienSerializer, RecipListShop, RecipeCreateSerializer, RecipeSerializer, SetPasswordSerializer, ShoppingCartSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
+from api.serializers import IngtedienSerializer, RecipeSerializer, SetPasswordSerializer, TagSerializer, UserAvatarAdd, UserCreateSerializer, UserSerializer
 from api.permissions import IsAuthenticatedorCreate, OwnerPermission, IsAdminOrReadOnly
 from .pagination import CustomPagination
 from users.models import Follow, MyUser
@@ -73,10 +73,10 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({'avatar': user.avatar.url}, status=HTTPStatus.OK)
             return Response(serializer.errors, status=HTTPStatus.BAD_REQUEST)
     
-    @action(detail=False, methods=['get'], permission_classes=IsAuthenticated)
-    def subscriptions(self, request):
-        serializer = FollowSerializer(many=True, context={'request': request})
-        return Response(serializer.data)
+    # @action(detail=False, methods=['get'], permission_classes=IsAuthenticated)
+    # def subscriptions(self, request):
+    #     serializer = FollowSerializer(many=True, context={'request': request})
+    #     return Response(serializer.data)
     
     @action(detail=True, methods=['post', 'delete'], permission_classes=IsAuthenticated)
     def subscribe(self, request, pk):
@@ -107,11 +107,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('author', 'tags__slug',)
 
-    def get_queryset(self):
-        if self.action == 'create':
-            return RecipeCreateSerializer
-        return RecipeSerializer
+    # def get_queryset(self):
+    #     if self.action == 'create':
+    #         return RecipeCreateSerializer
+    #     return RecipeSerializer
     
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     @action(detail=True, url_path='get-link', permission_classes=[IsAuthenticatedOrReadOnly])
     def get_link(self, request, pk=None):

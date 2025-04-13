@@ -74,3 +74,14 @@ class ShoppingCart(models.Model):
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
 
+class IngredientAmount(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='amount_ingredient',)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='amount_ingredient',)
+    amount = models.PositiveSmallIntegerField(default=1)
+
+    class Meta:
+        verbose_name = 'Кол-во ингредиентов'
+        verbose_name_plural = 'Кол-во ингредиентов'
+
+    def __str__(self):
+        return f'{self.ingredient} {self.recipe}'
