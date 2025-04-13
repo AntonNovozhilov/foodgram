@@ -1,39 +1,27 @@
 from http import HTTPStatus
 
+from api.api_v1.permissions import OwnerPermission
+from api.api_v1.serializers import (CustomUserSerializer, FollowSerializer,
+                                    IngtedienSerializer, RecipeSerializer,
+                                    RecipMiniSerializer, SetPasswordSerializer,
+                                    TagSerializer, UserAvatarAdd,
+                                    UserCreateSerializer)
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, filters
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly)
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
 from django_filters.rest_framework import DjangoFilterBackend
-
-from api.api_v1.serializers import (
-    CustomUserSerializer,
-    RecipMiniSerializer,
-    FollowSerializer,
-    IngtedienSerializer,
-    RecipeSerializer,
-    SetPasswordSerializer,
-    TagSerializer,
-    UserAvatarAdd,
-    UserCreateSerializer,
-)
-from api.permissions import OwnerPermission
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tags)
+from rest_framework import filters, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
 from users.models import Follow, MyUser
-from recipes.models import (
-    Favorite,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    ShoppingCart,
-    Tags,
-)
+
 from backend.settings import ALLOWED_HOSTS
+
 from .pagination import CustomPagination
 
 

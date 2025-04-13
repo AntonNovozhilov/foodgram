@@ -1,15 +1,11 @@
-from django.contrib import admin
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-from rest_framework.authtoken import views
+from api.api_v1.views import (IngredientViewSet, RecipeViewSet, TagViewSet,
+                              UserViewSet)
 from django.conf import settings
 from django.conf.urls.static import static
-
-from api.api_v1.views import (
-    IngredientViewSet,
-    RecipeViewSet,
-    TagViewSet,
-    UserViewSet)
+from django.contrib import admin
+from django.urls import include, path
+from rest_framework.authtoken import views
+from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
