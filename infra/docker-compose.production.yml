@@ -24,7 +24,7 @@ services:
       - backend
   infra:
     container_name: foodgram-proxy
-    build: ./
+    image: wowlass/foodgram_infra
     depends_on:
       - backend
       - frontend
