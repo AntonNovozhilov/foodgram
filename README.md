@@ -5,5 +5,17 @@ Foodgram - приложение чтобы делиться рецептами.
 - Добавлять/удалять рецепты в избранное.
 - Скачавать список покупок.
 
-Как задеплоить к себе на сервер 
+Скачать репозиторий
+```
+git@github.com:AntonNovozhilov/foodgram.git
+```
+Стек:
+[Django](https://www.djangoproject.com/)
+[DRF](https://www.django-rest-framework.org/)
+[Nginx](https://nginx.org/)
+[Gunicorne](https://gunicorn.org/)
+[Docker](https://app.docker.com/)
+[DockerHub](https://hub.docker.com/)
+[Postgresql](https://www.postgresql.org/)
 
+Проект доступен по [адресу](https://foodgram-novozhilov.ddns.net/)
