@@ -1,3 +1,5 @@
+![CI status push main](https://github.com/AntonNovozhilov/foodgram/actions/workflows/main.yml/badge.svg?branch=main&event=push)
+
 Foodgram - приложение чтобы делиться рецептами. 
 Вы можете:
 - Создавать свои рецепты.
