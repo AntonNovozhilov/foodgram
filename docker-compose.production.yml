@@ -19,7 +19,7 @@ services:
     image: wowlass/foodgram_frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
-      - ../frontend/:/app/result_build/
+      - static_volume:/frontend_static/
     depends_on:
       - backend
   infra:
