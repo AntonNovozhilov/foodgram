@@ -209,7 +209,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_link(self, request, pk=None):
         """Ссылка на рецепт."""
         recipe = get_object_or_404(Recipe, pk=pk)
-        link = f"https://{ALLOWED_HOSTS[0]}/recipes/{recipe.id}/"
+        host = request.get_host()
+        link = f"https://{host}/recipes/{recipe.id}/"
         return Response({"short-link": link}, status=HTTPStatus.OK)
 
     @action(

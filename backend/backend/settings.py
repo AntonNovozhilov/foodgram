@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'foodgram-novozhilov.ddns.net']
+ALLOWED_HOSTS = ['foodgram-novozhilov.ddns.net']
 
 
 # Application definition
