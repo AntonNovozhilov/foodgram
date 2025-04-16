@@ -1,5 +1,5 @@
-from django.shortcuts import get_object_or_404
-from djoser.serializers import UserSerializer
+# from django.shortcuts import get_object_or_404
+# from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, IngredientAmount, Recipe,
                             RecipeIngredient, Tags)
@@ -170,7 +170,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         seen = set()
         for item in ingredients:
             if item['id'].id in seen:
-                raise serializers.ValidationError('Ингредиенты должны быть уникальны.')
+                raise serializers.ValidationError(
+                    'Ингредиенты должны быть уникальны.')
             seen.add(item['id'].id)
         return ingredients
 
@@ -189,7 +190,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags)
         self.create_ingredients(ingredients, recipe)
         return recipe
-    
+
     # def update(self, instance, validated_data):
     #     """Обновление рецепта."""
     #     instance.image = validated_data.get('image', instance.image)
@@ -271,7 +272,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 #         if not image:
 #             raise serializers.ValidationError('Картинка обязательна.')
 #         if not ingredients:
-#             raise serializers.ValidationError('Нужен хотя бы один ингредиент.')
+#             raise serializers.Validation
+# Error('Нужен хотя бы один ингредиент.')
 
 #         ingredient_list = []
 #         for item in ingredients:
@@ -305,8 +307,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 #         recipe.tags.set(tags_data)
 #         self.create_ingredients(ingredients, recipe)
 #         return recipe
-
-    
 
 
 class RecipMiniSerializer(serializers.ModelSerializer):
