@@ -174,7 +174,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ("author", "tags__slug")
 
-
     def get_serializer_class(self):
         """Выбор сериализатора."""
         if self.action in ('list', 'retrieve'):

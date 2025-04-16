@@ -107,7 +107,7 @@ SIMPLE_JWT = {
     # Устанавливаем срок жизни токена
    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
    'AUTH_HEADER_TYPES': ('Bearer',),
-} 
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -141,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-AUTH_USER_MODEL = 'users.MyUser' 
+AUTH_USER_MODEL = 'users.MyUser'
 
 DJOSER = {
     "LOGIN_FIELD": "email",

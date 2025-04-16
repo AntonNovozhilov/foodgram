@@ -139,16 +139,16 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        """Добавление в избранное."""
+        """Проверка, добавлен ли рецепт в избранное текущим пользователем."""
         user = self.context.get('request').user
-        return (not user.is_anonymous and
-                obj.favorited_by.filter(user=user).exists())
+        return (
+            not user.is_anonymous and obj.favorited_by.filter(
+                user=user).exists())
 
     def get_is_in_shopping_cart(self, obj):
         """Добавление в список покупок."""
         user = self.context.get('request').user
-        return (not user.is_anonymous and
-                obj.cart.filter(user=user).exists())
+        return (not user.is_anonymous and obj.cart.filter(user=user).exists())
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
