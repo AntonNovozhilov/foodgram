@@ -169,7 +169,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для рецептов."""
 
     queryset = Recipe.objects.all()
-    # serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
@@ -177,15 +176,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
     def get_serializer_class(self):
+        """Выбор сериализатора."""
         if self.action in ('list', 'retrieve'):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
     def perform_create(self, serializer):
         """Создание рецепта."""
-        serializer.save(author=self.request.user)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        recipe = serializer.instance
+        read_serializer = RecipeReadSerializer(recipe, context={'request': request})
+        return Response(read_serializer.data, status=HTTPStatus.CREATED)
 
-    def destroy(self, request):
+    def destroy(self, request, *args, **kwargs):
         """Удаление рецепта."""
         recipe = self.get_object()
         if recipe.author == request.user:
