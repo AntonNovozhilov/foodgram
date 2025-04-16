@@ -12,4 +12,3 @@ class MyUserAdmin(admin.ModelAdmin):
 @admin.register(Follow)
 class SubscriptionsAdmin(admin.ModelAdmin):
     list_display = ['user', 'following']
-    
