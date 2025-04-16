@@ -2,10 +2,10 @@ from http import HTTPStatus
 
 from api.api_v1.permissions import OwnerPermission
 from api.api_v1.serializers import (CustomUserSerializer, FollowSerializer,
-                                    IngtedienSerializer, RecipeSerializer,
-                                    RecipMiniSerializer, SetPasswordSerializer,
-                                    TagSerializer, UserAvatarAdd,
-                                    UserCreateSerializer)
+                                    IngtedienSerializer, RecipeReadSerializer,
+                                    RecipeWriteSerializer, RecipMiniSerializer,
+                                    SetPasswordSerializer, TagSerializer,
+                                    UserAvatarAdd, UserCreateSerializer)
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -169,11 +169,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для рецептов."""
 
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    # serializer_class = RecipeSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ("author", "tags__slug")
+
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return RecipeReadSerializer
+        return RecipeWriteSerializer
 
     def perform_create(self, serializer):
         """Создание рецепта."""
