@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+from backend.api.api_v1.constants import MAX_VALIDATED, MIN_VALIDATED
 
 User = get_user_model()
 
@@ -55,9 +58,10 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipes'
+        related_name='recipes',
+        verbose_name='Автор',
     )
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name='Название',)
     image = models.ImageField(upload_to='recipes/images/')
     text = models.TextField()
     ingredients = models.ManyToManyField(
@@ -65,7 +69,12 @@ class Recipe(models.Model):
         through='RecipeIngredient'
     )
     tags = models.ManyToManyField(Tags)
-    cooking_time = models.PositiveSmallIntegerField()
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(MIN_VALIDATED),
+            MaxValueValidator(MAX_VALIDATED)
+        ]
+    )
     pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -89,7 +98,12 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='ingredients_in_recipe'
     )
-    amount = models.PositiveSmallIntegerField()
+    amount = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(MIN_VALIDATED),
+            MaxValueValidator(MAX_VALIDATED)
+        ]
+    )
 
 
 class Favorite(models.Model):
@@ -145,7 +159,12 @@ class IngredientAmount(models.Model):
         on_delete=models.CASCADE,
         related_name='amount_ingredient'
     )
-    amount = models.PositiveSmallIntegerField(default=1)
+    amount = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(MIN_VALIDATED),
+            MaxValueValidator(MAX_VALIDATED)
+        ]
+    )
 
     class Meta:
         verbose_name = 'Кол-во ингредиентов'
