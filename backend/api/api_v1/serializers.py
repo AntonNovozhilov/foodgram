@@ -170,7 +170,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         max_value=MAX_VALIDATED
     )
 
-
     class Meta:
         model = Recipe
         fields = (
