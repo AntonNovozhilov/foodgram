@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from backend.api.api_v1.constants import MAX_VALIDATED, MIN_VALIDATED
+from api.api_v1.constants import MAX_VALIDATED, MIN_VALIDATED
 
 User = get_user_model()
 
