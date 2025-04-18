@@ -42,7 +42,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return obj.followers.filter(user=user).exist()
+        return obj.followers.filter(user=user).exists()
 
 
 class SetPasswordSerializer(serializers.Serializer):
