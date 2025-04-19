@@ -159,7 +159,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeWriteSerializer(serializers.ModelSerializer):
     """Запись рецепта."""
 
-    ingredients = IngredientsinRecipeAmountSerializer(many=True, required=True)
+    ingredients = IngredientsinRecipeAmountSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tags.objects.all(),
         many=True
@@ -185,6 +185,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for tag_id in tags_data:
             if not Tags.objects.filter(id=tag_id).exists():
                 raise serializers.ValidationError('Тег не существует.')
+        return tags
 
     def validate_ingredients(self, ingredients):
         """Валидация."""
