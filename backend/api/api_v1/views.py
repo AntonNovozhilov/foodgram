@@ -168,6 +168,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Создание рецепта."""
         serializer.save(author=self.request.user)
+        return Response(serializer.data, status=HTTPStatus.OK)
 
     def destroy(self, request, *args, **kwargs):
         """Удаление рецепта."""
