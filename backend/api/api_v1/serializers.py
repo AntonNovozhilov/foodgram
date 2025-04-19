@@ -159,7 +159,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeWriteSerializer(serializers.ModelSerializer):
     """Запись рецепта."""
 
-    ingredients = IngredientsinRecipeAmountSerializer(many=True)
+    ingredients = IngredientsinRecipeAmountSerializer(many=True, required=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tags.objects.all(),
         many=True
