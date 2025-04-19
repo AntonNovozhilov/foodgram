@@ -4,24 +4,24 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (Ingredient, IngredientAmount, Recipe, ShoppingCart,
+                            Tags)
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-
-from api.api_v1.permissions import OwnerPermission
-from api.api_v1.serializers import (CustomUserSerializer, FollowSerializer,
-                                    IngtedienSerializer, RecipeReadSerializer,
-                                    RecipeWriteSerializer, RecipMiniSerializer,
-                                    SetPasswordSerializer, TagSerializer,
-                                    UserAvatarAdd, UserCreateSerializer)
-from recipes.models import (Ingredient, IngredientAmount, Recipe, ShoppingCart,
-                            Tags)
 from users.models import MyUser
 
+from .filter import RecipeFilter
 from .pagination import CustomPagination
+from .permissions import OwnerPermission
+from .serializers import (CustomUserSerializer, FollowSerializer,
+                          IngtedienSerializer, RecipeReadSerializer,
+                          RecipeWriteSerializer, RecipMiniSerializer,
+                          SetPasswordSerializer, TagSerializer, UserAvatarAdd,
+                          UserCreateSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -157,7 +157,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('author', 'tags')
+    filterset_fields = RecipeFilter
 
     def get_serializer_class(self):
         """Выбор сериализатора."""

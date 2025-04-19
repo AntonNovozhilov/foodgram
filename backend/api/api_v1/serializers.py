@@ -1,9 +1,8 @@
-from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
-
 from api.api_v1.constants import MAX_VALIDATED, MIN_VALIDATED
+from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, IngredientAmount, Recipe,
                             RecipeIngredient, Tags)
+from rest_framework import serializers
 from users.models import MyUser
 
 
