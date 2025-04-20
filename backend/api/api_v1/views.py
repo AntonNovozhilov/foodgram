@@ -134,12 +134,13 @@ class UserViewSet(viewsets.ModelViewSet):
         """Подписаться, отписаться."""
         following = get_object_or_404(MyUser, pk=pk)
         user = request.user
+        following.id = request.data['following']
         if request.method == 'POST':
+            data = request.data.copy()
+            data['following'] = following.id
             serializer = FollowSerializer(
-                data=request.data,
-                context={'request': request,
-                         'following': following
-                        }
+                data=data,
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
