@@ -134,7 +134,6 @@ class UserViewSet(viewsets.ModelViewSet):
         """Подписаться, отписаться."""
         following = get_object_or_404(MyUser, pk=pk)
         user = request.user
-        following.id = request.data['following']
         if request.method == 'POST':
             data = request.data.copy()
             data['following'] = following.id
