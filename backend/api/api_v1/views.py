@@ -131,11 +131,13 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def subscribe(self, request, pk):
         """Подписаться, отписаться."""
-        following = get_object_or_404(MyUser, pk=pk)
+        following = get_object_or_404(MyUser, id=pk)
         user = request.user
         if request.method == 'POST':
             serializer = FollowSerializer(
-                following, context={'request': request}
+                user=user,
+                following=following,
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             return Response(serializer.data, status=HTTPStatus.CREATED)

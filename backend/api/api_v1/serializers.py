@@ -3,7 +3,7 @@ from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, IngredientAmount, Recipe,
                             RecipeIngredient, Tags)
 from rest_framework import serializers
-from users.models import MyUser
+from users.models import Follow, MyUser
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -245,15 +245,20 @@ class RecipMiniSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     """Подписки."""
 
+    id = serializers.ReadOnlyField(source='following.id')
+    email = serializers.ReadOnlyField(source='following.email')
+    username = serializers.ReadOnlyField(source='following.username')
+    first_name = serializers.ReadOnlyField(source='following.first_name')
+    last_name = serializers.ReadOnlyField(source='following.last_name')
     recipes = serializers.SerializerMethodField()
     recipe_count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        model = MyUser
+        model = Follow
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipe_count', 'avatar'
+            'is_subscribed', 'recipes', 'recipe_count',
         )
 
     def validate(self, data):
