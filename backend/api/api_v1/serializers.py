@@ -265,7 +265,8 @@ class FollowSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Валдиация сериализатора."""
         user = self.context['request'].user
-        following = self.context.get('following')
+        following_id = self.context.get('following')
+        following = get_object_or_404(MyUser, pk=following_id)
         if user == following:
             raise serializers.ValidationError("Нельзя подписаться на себя")
         if user.followers.filter(pk=following.pk).exists():
