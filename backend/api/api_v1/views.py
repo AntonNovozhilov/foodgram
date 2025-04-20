@@ -135,7 +135,7 @@ class UserViewSet(viewsets.ModelViewSet):
         author = get_object_or_404(MyUser, id=pk)
         user = request.user
         if request.method == 'POST':
-            follow = Follow.objects.create(user=user, author=author)
+            follow = Follow.objects.create(user=user, following=author)
             serializer = FollowSerializer(
                 follow, context={'request': request}
             )
