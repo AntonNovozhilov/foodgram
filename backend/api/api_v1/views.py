@@ -123,7 +123,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = FollowSerializer(
             result_page, many=True, context={'request': request}
         )
-        return result_page.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
@@ -136,8 +136,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         if request.method == 'POST':
             serializer = FollowSerializer(
-                data={'following': following.id},
-                context={'request': request}
+                data=request.data,
+                context={'request': request,
+                         'following': following.id
+                        }
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
