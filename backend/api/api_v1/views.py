@@ -130,9 +130,9 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
-    def subscribe(self, request, id):
+    def subscribe(self, request, pk):
         """Подписаться, отписаться."""
-        author = get_object_or_404(MyUser, id=id)
+        author = get_object_or_404(MyUser, id=pk)
         user = request.user
         if request.method == 'POST':
             follow = Follow.objects.create(user=user, author=author)
