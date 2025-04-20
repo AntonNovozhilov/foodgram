@@ -138,7 +138,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = FollowSerializer(
                 data=request.data,
                 context={'request': request,
-                         'following': following.id
+                         'following': following
                         }
             )
             serializer.is_valid(raise_exception=True)
