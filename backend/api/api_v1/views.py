@@ -150,6 +150,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=HTTPStatus.BAD_REQUEST
             )
 
+
 class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для рецептов."""
 
