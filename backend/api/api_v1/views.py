@@ -141,7 +141,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.data, status=HTTPStatus.CREATED)
         if request.method == 'DELETE':
-            follow = Follow.followers.filter(user=user)
+            follow = Follow.objects.filter(user=user, following=author)
             if follow.exists():
                 follow.delete()
                 return Response(status=HTTPStatus.NO_CONTENT)
