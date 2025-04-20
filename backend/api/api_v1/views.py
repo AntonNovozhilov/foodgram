@@ -122,6 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = FollowSerializer(
             authors, many=True, context={'request': request}
         )
+        print('SERIALIZED DATA:', serializer.data)
         return Response(serializer.data)
 
     @action(
@@ -157,7 +158,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = RecipeFilter
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         """Выбор сериализатора."""
