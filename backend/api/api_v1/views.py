@@ -130,30 +130,25 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
-    def subscribe(self, request, pk):
+    def subscribe(self, request, id):
         """Подписаться, отписаться."""
-        following = get_object_or_404(MyUser, pk=pk)
+        author = get_object_or_404(MyUser, id=id)
         user = request.user
         if request.method == 'POST':
-            data = request.data.copy()
-            data['following'] = following.id
+            follow = Follow.objects.create(user=user, author=author)
             serializer = FollowSerializer(
-                data=data,
-                context={'request': request}
+                follow, context={'request': request}
             )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
             return Response(serializer.data, status=HTTPStatus.CREATED)
         if request.method == 'DELETE':
-            subscriber = user.followers.filter(following=following)
-            if subscriber.exists():
-                subscriber.delete()
+            follow = Follow.followers.filter(user=user)
+            if follow.exists():
+                follow.delete()
                 return Response(status=HTTPStatus.NO_CONTENT)
             return Response(
                 {'errors': 'Подписки нет'},
                 status=HTTPStatus.BAD_REQUEST
             )
-
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для рецептов."""
