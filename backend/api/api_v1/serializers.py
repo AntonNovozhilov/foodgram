@@ -276,13 +276,13 @@ class FollowSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if user.is_anonymous:
             return False
-        return obj.followers.filter(user=user).exists()
+        return obj.following.followers.filter(user=user).exists()
 
     def get_recipes(self, obj):
         """Список рецептов подписанного пользователя."""
-        queryset = obj.recipes.all()
+        queryset = obj.following.recipes.all()
         return RecipMiniSerializer(queryset, many=True).data
 
     def get_recipe_count(self, obj):
         """Количество рецептов."""
-        return obj.recipes.count()
+        return obj.following.recipes.count()
