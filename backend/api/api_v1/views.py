@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from users.models import MyUser
+from users.models import Follow, MyUser
 
 from .filter import RecipeFilter
 from .pagination import CustomPagination
@@ -118,11 +118,10 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def subscriptions(self, request):
         """Подписки."""
-        authors = MyUser.objects.filter(followers__user=request.user)
+        authors = Follow.objects.filter(user=request.user)
         serializer = FollowSerializer(
             authors, many=True, context={'request': request}
         )
-        print('SERIALIZED DATA:', serializer.data)
         return Response(serializer.data)
 
     @action(

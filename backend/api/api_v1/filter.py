@@ -1,13 +1,14 @@
 from django_filters import rest_framework as filter
 
+from users.models import MyUser
 from recipes.models import Recipe
 
 
 class RecipeFilter(filter.FilterSet):
     """Катомный фильтр для рецепта."""
 
-    tags = filter.CharFilter(field_name='tags__slug')
-    author = filter.NumberFilter(field_name='author__id')
+    tags = filter.AllValuesMultipleFilter(field_name='tags__slug')
+    author = filter.ModelChoiceFilter(queryset=MyUser.objects.all())
     is_favorited = filter.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filter.BooleanFilter(method='filter_is_in_shopping_cart')
 
