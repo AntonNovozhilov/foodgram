@@ -268,10 +268,10 @@ class FollowSerializer(serializers.ModelSerializer):
         following = self.context.get('following')
         if user == following:
             raise serializers.ValidationError("Нельзя подписаться на себя")
-        if user.following_set.filter(pk=following.pk).exists():
+        if user.followers.filter(pk=following.pk).exists():
             raise serializers.ValidationError("Вы уже подписаны")
         return data
-    
+
     def create(self, validated_data):
         user = self.context['request'].user
         following_id = self.initial_data.get('following')
