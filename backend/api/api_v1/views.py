@@ -119,10 +119,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def subscriptions(self, request):
         """Подписки."""
         authors = Follow.objects.filter(user=request.user)
+        result_page = self.paginate_queryset(authors)
         serializer = FollowSerializer(
-            authors, many=True, context={'request': request}
+            result_page, many=True, context={'request': request}
         )
-        return Response(serializer.data)
+        return result_page.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
@@ -131,15 +132,15 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def subscribe(self, request, pk):
         """Подписаться, отписаться."""
-        following = get_object_or_404(MyUser, id=pk)
+        following = get_object_or_404(MyUser, pk=pk)
         user = request.user
         if request.method == 'POST':
             serializer = FollowSerializer(
-                user=user,
-                following=following,
+                data={'following': following.id},
                 context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(serializer.data, status=HTTPStatus.CREATED)
         if request.method == 'DELETE':
             subscriber = user.followers.filter(following=following)
@@ -214,7 +215,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
         if request.method == 'POST':
-            if user.favorites.filter(user=user).exists():
+            if user.favorites.filter(recipe=recipe).exists():
                 return Response(
                     {'errors': 'Рецепт уже в избранном'},
                     status=HTTPStatus.BAD_REQUEST,

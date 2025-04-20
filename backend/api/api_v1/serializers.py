@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from api.api_v1.constants import MAX_VALIDATED, MIN_VALIDATED
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (Ingredient, IngredientAmount, Recipe,
@@ -270,6 +271,12 @@ class FollowSerializer(serializers.ModelSerializer):
         if user.following_set.filter(pk=following.pk).exists():
             raise serializers.ValidationError("Вы уже подписаны")
         return data
+    
+    def create(self, validated_data):
+        user = self.context['request'].user
+        following_id = self.initial_data.get('following')
+        following = get_object_or_404(MyUser, id=following_id)
+        return Follow.objects.create(user=user, following=following)
 
     def get_is_subscribed(self, obj):
         """Проверка подписки."""
