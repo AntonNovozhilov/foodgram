@@ -83,5 +83,6 @@ sudo docker-compose up -d --build
 [Docker](https://app.docker.com/)
 [DockerHub](https://hub.docker.com/)
 [Postgresql](https://www.postgresql.org/)
+## Автор
 
-Проект доступен по [адресу](https://foodgram-novozhilov.ddns.net/)
+Разработано в рамках учебного проекта Yandex Практикум. Автор [Новожилов Антон Алексеевич](https://github.com/AntonNovozhilov)
